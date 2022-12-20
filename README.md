@@ -1,5 +1,7 @@
 A configuration template for clash.
 
+[简体中文 in Simplified Chinese](https://github.com/QieSen/ConfigTemplateForClash/blob/main/README_CHS.md)
+
 ## Feature
 Using **Proxy Provider** and **Rule Provider**, with auto update enabled.
 
