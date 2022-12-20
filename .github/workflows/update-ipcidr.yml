@@ -1,0 +1,51 @@
+name: Update IPcidr
+# credit with:
+# https://github.com/Loyalsoldier/geoip
+# https://github.com/kiddin9/china_ip_list
+
+on:
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    - cron: '0 12 ? * FRI'  # every Friday noon
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/update-ipcidr.yml'
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout codebase
+      uses: actions/checkout@v2
+
+    - name: Append CIDRs
+      run: |
+        # CNips
+        curl -sSLR -o /tmp/17mon "https://raw.githubusercontent.com/17mon/china_ip_list/master/china_ip_list.txt"
+        curl -sSLR -o /tmp/chunzhen "https://raw.githubusercontent.com/metowolf/iplist/master/data/special/china.txt"
+        curl -sSLR -o /tmp/clang "https://ispip.clang.cn/all_cn.txt"
+        cat /tmp/17mon /tmp/clang /tmp/chunzhen | sort | uniq > /tmp/cn
+        sed -i 's/^/- /g' /tmp/cn
+        sed -e '1ipayload:' /tmp/cn > rules/cncidr.yaml
+        # google
+        curl -sSL https://www.gstatic.com/ipranges/goog.json | jq -r '"#syncToken: " + .syncToken, "#creationTime: " + .creationTime, "- " + .prefixes[].ipv4Prefix, "- " + .prefixes[].ipv6Prefix' | grep -E ":|/" > /tmp/google
+        curl -sSL https://www.gstatic.com/ipranges/cloud.json | jq -r '"#syncToken: " + .syncToken, "#creationTime: " + .creationTime, "- " + .prefixes[].ipv4Prefix, "- " + .prefixes[].ipv6Prefix' | grep -E ":|/" > /tmp/gcloud
+        cat /tmp/google /tmp/gcloud | sort | uniq > /tmp/googleips
+        sed -e '1ipayload:' /tmp/googleips > rules/googlecidr.yaml
+        # cloudflare
+        curl -sSL https://www.cloudflare.com/ips-v4 | grep "/" >> /tmp/cloudflare
+        curl -sSL https://www.cloudflare.com/ips-v6 | grep "/" >> /tmp/cloudflare
+        sed -i 's/^/- /g' /tmp/cloudflare
+        sed -e '1ipayload:' /tmp/cloudflare > rules/cloudflarecidr.yaml
+        # fastly
+        curl -sSL https://api.fastly.com/public-ip-list | jq --raw-output '"payload:", "- " + .addresses[], "- " + .ipv6_addresses[]' > rules/fastlycidr.yaml
+        # cloudfront
+        curl -sSL https://ip-ranges.amazonaws.com/ip-ranges.json | jq -r '"payload:", "#syncToken: " + .syncToken, "#createDate: " + .createDate, "- " + (.prefixes[],.ipv6_prefixes[] | select(.service == "CLOUDFRONT") | .ip_prefix,.ipv6_prefix)' | grep -E ":|/" > rules/cloudfrontcidr.yaml
+
+    - name: Commit & Push changes
+      uses: actions-js/push@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        message: 'Auto update IPcidr'

@@ -1,0 +1,286 @@
+mixed-port: 7890    #可修改 #使用相同端口运行http代理服务和socks代理服务
+# port: 7890    #可修改 #http代理端口
+# socks-port: 7890    #可修改 #socks4/5代理端口
+# interface-name: en0
+bind-address: "*"
+allow-lan: true
+# authentication:
+  # - "user1:pass1"
+mode: rule
+log-level: silent
+ipv6: false
+# routing-mark: 6666
+external-controller: "127.0.0.1:9090"
+# external-ui: folder  # http://{{external-controller}}/ui
+# secret: ""
+# hosts:
+  # '*.clash.dev': 127.0.0.1
+profile:
+  store-selected: true
+  store-fake-ip: true
+# tun:
+#   enable: true
+#   stack: system  # or gvisor
+#   auto-route: true
+#   auto-detect-interface: true
+#   dns-hijack:
+#     - any:53
+#     - tcp://any:53
+
+dns:
+  enable: true
+  listen: "0.0.0.0:53"
+  ipv6: false
+  enhanced-mode: fake-ip
+  fake-ip-range: "198.18.0.1/16"
+  #use-hosts: true
+  fake-ip-filter:    #可修改  #直接返回真实ip的域名
+    - "time.windows.com"
+    - "time.apple.com"
+    - "time.android.com"
+    - "ntp.aliyun.com"
+    - "time.pool.aliyun.com"
+    - "ntp.ntsc.ac.cn"
+    - "cn.ntp.org.cn"
+    - "edu.ntp.org.cn"
+    - "cn.pool.ntp.org"
+    - "pool.ntp.org"
+    - "asia.pool.ntp.org"
+    - "pool.ntp.org"
+  # nameserver-policy:    #可修改  #为特定域名指定dns服务器，按需启用
+    # "+.qq.com": "119.29.29.29"
+  default-nameserver:
+    - "114.114.114.114"
+  nameserver:
+    - "tls://dns.alidns.com:853"
+    - "https://dns.alidns.com/dns-query"
+    - "tls://dot.pub:853"
+    - "https://doh.pub/dns-query"
+  fallback:
+    - "https://1.1.1.1/dns-query"
+    - "https://185.222.222.222/dns-query"
+    - "https://45.11.45.11/dns-query"
+  fallback-filter:
+    # geoip: true    #本配置不使用geoip，如使用meta内核或者自定义geoip库可修改，按需启用
+    # geoip-code: CN
+    ipcidr:
+      - "0.0.0.0/8"
+      - "10.0.0.0/8"
+      - "28.0.0.0/8"
+      - "100.64.0.0/10"
+      - "127.0.0.0/8"
+      - "169.254.0.0/16"
+      - "172.16.0.0/12"
+      - "192.0.0.0/24"
+      - "192.0.2.0/24"
+      - "192.88.99.0/24"
+      - "192.168.0.0/16"
+      - "198.18.0.0/15"
+      - "198.51.100.0/24"
+      - "203.0.113.0/24"
+      - "224.0.0.0/3"
+      - "255.255.255.255/32"
+      - "::1/128"
+      - "fc00::/7"
+      - "fe80::/10"
+    domain:    #可修改  #默认使用fallback dns查询的域名
+      - "+.jsdelivr.net"
+      - "+.github.com"
+      - "+.githubusercontent.com"
+      - "sub.id9.cc"
+      - "sub.xeton.dev"
+      - "api.dler.io"
+      - "sub.maoxiongnet.com"
+
+
+#proxies:    #可修改  #独立节点，本配置默认不使用，按需启用
+
+
+proxy-providers:
+
+# 字典嵌套字典类型
+#  name:          #可修改  #节点集合名称，不可重复。改名后记得同步修改 proxy-groups 中的名称
+#    type:          #类型：http、file
+#    path:          #可修改  #本地文件名，多个集合可使用相同文件名，通过filter过滤节点
+#    url: ''           #订阅网址，只要包含 proxies 字段就行，使用英文引号避免包含yaml保留字符
+#    interval:      #可修改  #更新间隔
+#    filter:          #可修改  #过滤需要的节点，支持正则但不支持lookaround匹配
+#    health-check: 
+#      enable:     #延迟测试开关，不建议关闭
+#      url:           #测速地址，不建议修改
+#      interval:    #可修改  #延迟测试间隔，根据需要
+
+  main:
+    type: http
+    path: ./providers/proxies/main.yaml
+    url: '#必须填写'
+    interval: 3600
+    health-check:
+      enable: true
+      url: 'http://www.gstatic.com/generate_204'
+      interval: 900
+
+  main-us:
+    type: http
+    path: ./providers/proxies/main.yaml
+    url: '#必须填写'
+    interval: 3600
+    filter: '美国|US|🇺🇸|United States|America'
+    health-check:
+      enable: true
+      url: 'http://www.gstatic.com/generate_204'
+      interval: 300
+
+  backup-jp:
+    type: http
+    path: ./providers/proxies/backup.yaml
+    url: '#必须填写'
+    interval: 3600
+    filter: '日本|JP|🇯🇵|Japan'
+    health-check:
+      enable: true
+      url: 'http://www.gstatic.com/generate_204'
+      interval: 900
+
+
+proxy-groups:
+
+# 注意对齐缩进
+# 列表嵌套字典类型
+# - name:             #可修改  #节点分组名称，不可重复
+#   type:               #可修改  #分组模式：select、fallback、url-test、load-balance
+#   url:                  #测速地址，不建议修改
+#   interval:           #可修改  #延迟测试间隔，缺少此参数不能自动切换
+#   tolerance:        #可修改  #只对url-test类型生效，延迟差值大于此阈值才会切换，减少切换次数，按需启用
+#   lazy:                #可修改  #true/false，当节点分组没被选中，就不测试延迟，自动类型分组都可以，按需启用
+#   disable-udp:    #true/false，按需启用
+#   proxies:           #可修改  #可填写：节点分组名称、保留节点名称 (DIRECT, REJECT)、proxies 字段中的独立节点名称
+#   use:                #可修改  #只能填写 proxy-providers 字段中的节点集名称
+
+# 也可以一行写完
+#  - {name: 普通, type: 'select', proxies: []}
+#  - {name: 自动, type: 'fallback', url: 'http://www.gstatic.com/generate_204', interval: 90, lazy:true, use: []}
+
+  - name: 手动切换
+    type: select
+    proxies:
+      - 顺序切换
+      - 择优切换
+      - 负载均衡
+      - DIRECT     #保留节点，直连
+      - REJECT    #保留节点，拒绝连接
+    use:              #use和proxies可以同时使用，但至少要有其中一个
+      - main-us    #包含 main-us 节点集合中的所有节点
+      - backup-jp
+
+  - name: 顺序切换
+    type: fallback    #按排列顺序自动选中，当前节点失效才切换下一个
+    url: 'http://www.gstatic.com/generate_204'
+    interval: 180
+    use:
+      - main-us
+    proxies:
+      - 负载均衡
+      - 择优切换
+      - DIRECT
+
+  - name: 择优切换
+    type: url-test    #自动选中延迟最低的节点
+    url: 'http://www.gstatic.com/generate_204'
+    interval: 600
+    tolerance: 100
+    use:
+      - main
+
+  - name: 负载均衡
+    type: load-balance    #将流量通过多个节点发送
+    url: 'http://www.gstatic.com/generate_204'
+    interval: 180
+    lazy: true
+    use:
+      - backup-jp
+
+  - name: 直连
+    type: select
+    proxies:
+      - DIRECT
+      - 手动切换
+
+  - name: 拦截
+    type: select
+    proxies:
+      - REJECT
+      - DIRECT
+      - 手动切换
+
+  - name: 漏网之鱼
+    type: select
+    proxies:
+      - 手动切换
+      - DIRECT
+
+
+rule-providers:
+
+# 字典嵌套字典类型
+# name:                       # 可修改  #规则集合名称，不可重复
+#    type:                     #类型：http、file
+#    behavior:               #格式：domain、ipcidr、classical
+#    url:                        #订阅网址，只要包含 payload 字段就行，使用英文引号避免包含yaml保留字符
+#    path:                     #可修改  #本地文件名
+#    interval: 259200    #可修改  #更新间隔，不需要太频繁
+
+  IP-China: {type: http, behavior: ipcidr, url: 'https://raw.githubusercontent.com/QieSen/ConfigTemplateForClash/main/rules/cncidr.yaml', path: './providers/rules/ipcidr-China.yaml', interval: 259200}
+  IP-Fastly: {type: http, behavior: ipcidr, url: 'https://raw.githubusercontent.com/QieSen/ConfigTemplateForClash/main/rules/fastlycidr.yaml', path: './providers/rules/ipcidr-fastly.yaml', interval: 259200}
+  IP-Google: {type: http, behavior: ipcidr, url: 'https://raw.githubusercontent.com/QieSen/ConfigTemplateForClash/main/rules/googlecidr.yaml', path: './providers/rules/ipcidr-google.yaml', interval: 259200}
+  IP-Cloudflare: {type: http, behavior: ipcidr, url: 'https://raw.githubusercontent.com/QieSen/ConfigTemplateForClash/main/rules/cloudflarecidr.yaml', path: './providers/rules/ipcidr-cloudflare.yaml', interval: 259200}
+  IP-Cloudfront: {type: http, behavior: ipcidr, url: 'https://raw.githubusercontent.com/QieSen/ConfigTemplateForClash/main/rules/cloudfrontcidr.yaml', path: './providers/rules/ipcidr-cloudfront.yaml', interval: 259200}
+  混合-GoogleFCM: {type: http, behavior: classical, url: 'https://raw.githubusercontent.com/QieSen/ConfigTemplateForClash/main/rules/GoogleFCM.yaml', path: './providers/rules/classical-googleFCM.yaml', interval: 259200}
+  混合-GooglePlay: {type: http, behavior: classical, url: 'https://raw.githubusercontent.com/QieSen/ConfigTemplateForClash/main/rules/GooglePlay.yaml', path: './providers/rules/classical-googlePlay.yaml', interval: 259200} 
+  IP-LAN: {type: http, behavior: ipcidr, url: 'https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/lancidr.txt', path: './providers/rules/ipcidr-lan.yaml', interval: 259200}
+  IP-Telegram: {type: http, behavior: ipcidr, url: 'https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/telegramcidr.txt', path: './providers/rules/ipcidr-telegram.yaml', interval: 259200}
+  域名-reject: {type: http, behavior: domain, url: 'https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/reject.txt', path: './providers/rules/domain-reject.yaml', interval: 259200}
+  域名-direct: {type: http, behavior: domain, url: 'https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/direct.txt', path: './providers/rules/domain-direct.yaml', interval: 259200}
+  域名-gfw: {type: http, behavior: domain, url: 'https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/gfw.txt', path: './providers/rules/domain-gfw.yaml', interval: 259200}
+  域名-proxy: {type: http, behavior: domain, url: 'https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/proxy.txt', path: './providers/rules/domain-proxy.yaml', interval: 259200}
+  域名-greatfire: {type: http, behavior: domain, url: 'https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/greatfire.txt', path: './providers/rules/domain-greatfire.yaml', interval: 259200}
+  混合-常用程序: {type: http, behavior: classical, url: 'https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/applications.txt', path: './providers/rules/classical-applications.yaml', interval: 259200}
+  混合-BanAD: {type: http, behavior: classical, url: 'https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Providers/BanAD.yaml', path: './providers/rules/classical-BanAD.yaml', interval: 259200}
+  混合-China: {type: http, behavior: classical, url: 'https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Providers/ChinaDomain.yaml', path: './providers/rules/classical-China.yaml', interval: 259200}
+  混合-Steam: {type: http, behavior: classical, url: 'https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Providers/Ruleset/Steam.yaml', path: './providers/rules/classical-Steam.yaml', interval: 259200}
+  混合-SteamCN: {type: http, behavior: classical, url: 'https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Providers/Ruleset/SteamCN.yaml', path: './providers/rules/classical-SteamCN.yaml', interval: 259200}
+  混合-Netflix: {type: http, behavior: classical, url: 'https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Providers/Ruleset/Netflix.yaml', path: './providers/rules/classical-Netflix.yaml', interval: 259200}
+  混合-Youtube: {type: http, behavior: classical, url: 'https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Providers/Ruleset/YouTube.yaml', path: './providers/rules/classical-Youtube.yaml', interval: 259200}
+  混合-Spotify: {type: http, behavior: classical, url: 'https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Providers/Ruleset/Spotify.yaml', path: './providers/rules/classical-Spotify.yaml', interval: 259200}
+
+
+rules:
+
+# 有序列表类型，自上而下匹配
+# 一般来说：特定需求 > 广告屏蔽 > 代理规则 > 直连规则 > IP规则（需要本地DNS解析） > MATCH
+
+  - DOMAIN-SUFFIX,gstatic.com,手动切换    #特定需求可添加单条规则
+  - RULE-SET,IP-Telegram,手动切换,no-resolve
+  - RULE-SET,混合-BanAD,拦截
+  - RULE-SET,域名-reject,拦截
+  - RULE-SET,混合-GoogleFCM,手动切换
+  - RULE-SET,混合-GooglePlay,手动切换
+  - DOMAIN-KEYWORD,google,手动切换
+  - RULE-SET,混合-SteamCN,直连
+  - RULE-SET,混合-Steam,手动切换
+  - RULE-SET,混合-Netflix,手动切换
+  - RULE-SET,混合-Youtube,手动切换
+  - RULE-SET,混合-Spotify,手动切换
+  - RULE-SET,混合-常用程序,直连
+  - RULE-SET,混合-China,直连
+  - RULE-SET,域名-direct,直连
+  - RULE-SET,域名-gfw,手动切换
+  - RULE-SET,域名-proxy,手动切换
+  - RULE-SET,域名-greatfire,手动切换
+  - RULE-SET,IP-Cloudflare,手动切换
+  - RULE-SET,IP-Cloudfront,手动切换
+  - RULE-SET,IP-Fastly,手动切换
+  - RULE-SET,IP-Google,手动切换
+  - RULE-SET,IP-LAN,直连
+  - RULE-SET,IP-China,直连
+  - MATCH,漏网之鱼
