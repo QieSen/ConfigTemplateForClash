@@ -200,6 +200,12 @@ proxy-groups:
     use:
       - backup-jp
 
+  - name: 谷歌推送
+    type: select
+    proxies:
+      - DIRECT
+      - 手动切换
+      
   - name: 直连
     type: select
     proxies:
@@ -263,7 +269,7 @@ rules:
   - RULE-SET,IP-Telegram,手动切换,no-resolve
   - RULE-SET,混合-BanAD,拦截
   - RULE-SET,域名-reject,拦截
-  - RULE-SET,混合-GoogleFCM,手动切换
+  - RULE-SET,混合-GoogleFCM,谷歌推送     # 只要DNS靠谱，绝大部分时间中FCM均可直连正常工作，稳定性优于使用节点
   - RULE-SET,混合-GooglePlay,手动切换
   - DOMAIN-KEYWORD,google,手动切换
   - RULE-SET,混合-SteamCN,直连
