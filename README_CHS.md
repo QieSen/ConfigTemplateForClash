@@ -6,15 +6,15 @@ clash 配置文件模板
 
 将经常需要更新的节点和规则分离，或在一个配置文件中混合使用多个不同来源的订阅，脱离基础配置，摆脱部分订阅自带的陈旧规则，尽可能避免因规则引起断流。
 
-点击此处了解 [Proxy Provider](https://lancellc.gitbook.io/clash/clash-config-file/proxy-provider) 和 [Rule Provider](https://lancellc.gitbook.io/clash/clash-config-file/rule-provider)。
+点击此处了解 [Proxy Provider](https://clash.wiki/configuration/outbound.html#proxy-providers-代理集) 和 [Rule Provider](https://clash.wiki/premium/rule-providers.html)。
 
 ## 兼容性
 
-本配置文件**仅支持** [Clash Premium 核心](https://github.com/Dreamacro/clash/releases/tag/premium) (闭源) 和实现了 Provider 功能的第三方 clash 核心，如 [Clash.Meta 核心](https://github.com/MetaCubeX/Clash.Meta) (开源)。
+本配置文件**仅支持** [Clash Premium 核心](https://github.com/Dreamacro/clash/releases/tag/premium) (闭源，已删库) 和实现了 Provider 功能的第三方 clash 核心，如 [Clash.Meta 核心](https://github.com/MetaCubeX/Clash.Meta) (开源)。
 
-使用 Clash Premium 核心的用户界面应用：[CFA Premium 版本](https://github.com/Kr328/ClashForAndroid/releases) (Android) 和 [CFW](https://github.com/Fndroid/clash_for_windows_pkg/releases) (Windows/MacOS)。
+使用 Clash Premium 核心的用户界面应用：[CFA Premium 版本](https://github.com/Kr328/ClashForAndroid/releases) (Android，已删库) 和 [CFW](https://github.com/Fndroid/clash_for_windows_pkg/releases) (Windows/MacOS，已删库)。
 
-使用 Clash.Meta 核心的用户界面应用：[CMFA](https://github.com/MetaCubeX/ClashMetaForAndroid) (Android)。
+使用 Clash.Meta 核心的用户界面应用：[FlClash](https://github.com/chen08209/FlClash)（多平台支持）或 [CMFA](https://github.com/MetaCubeX/ClashMetaForAndroid) (Android)。
 
 ## 使用方法
 
