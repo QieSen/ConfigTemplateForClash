@@ -1,31 +1,31 @@
 mixed-port: 7890    #可修改 #使用相同端口运行http代理服务和socks代理服务
-# port: 7890    #可修改 #http代理端口
-# socks-port: 7890    #可修改 #socks4/5代理端口
-# interface-name: en0
+  #port: 7890    #可修改 #http代理端口
+  #socks-port: 7890    #可修改 #socks4/5代理端口
+  #interface-name: en0
 bind-address: "*"
-allow-lan: true
-# authentication:
-  # - "user1:pass1"
+allow-lan: false
+  #authentication:
+    #- "user1:pass1"
 mode: rule
 log-level: silent
 ipv6: false
-# routing-mark: 6666
+  #routing-mark: 6666
 external-controller: "127.0.0.1:9090"
-# external-ui: folder  # http://{{external-controller}}/ui
-# secret: ""
-# hosts:
-  # '*.clash.dev': 127.0.0.1
+  #external-ui: folder  # http://{{external-controller}}/ui
+  #secret: ""
+  #hosts:
+    #'*.clash.dev': 127.0.0.1
 profile:
   store-selected: true
   store-fake-ip: true
-# tun:
-#   enable: true
-#   stack: system  # or gvisor
-#   auto-route: true
-#   auto-detect-interface: true
-#   dns-hijack:
-#     - any:53
-#     - tcp://any:53
+  #tun:
+   #enable: true
+   #stack: system  # or gvisor
+   #auto-route: true
+   #auto-detect-interface: true
+   #dns-hijack:
+     #- any:53
+     #- tcp://any:53
 
 dns:
   enable: true
@@ -47,22 +47,22 @@ dns:
     - "pool.ntp.org"
     - "asia.pool.ntp.org"
     - "pool.ntp.org"
-  # nameserver-policy:    #可修改  #为特定域名指定dns服务器，按需启用
-    # "+.qq.com": "119.29.29.29"
+  #nameserver-policy:    #可修改  #为特定域名指定dns服务器，按需启用
+    #"+.qq.com": "119.29.29.29"
   default-nameserver:
     - "114.114.114.114"
   nameserver:
-    - "tls://dns.alidns.com:853"
+    #- "tls://dns.alidns.com:853"
     - "https://dns.alidns.com/dns-query"
-    - "tls://dot.pub:853"
+    #- "tls://dot.pub:853"
     - "https://doh.pub/dns-query"
   fallback:
     - "https://1.1.1.1/dns-query"
     - "https://185.222.222.222/dns-query"
     - "https://45.11.45.11/dns-query"
   fallback-filter:
-    # geoip: true    #本配置不使用geoip，如使用meta内核或者自定义geoip库可修改，按需启用
-    # geoip-code: CN
+    #geoip: true    #本配置不使用geoip，如使用meta内核或者自定义geoip库可修改，按需启用
+    #geoip-code: CN
     ipcidr:
       - "0.0.0.0/8"
       - "10.0.0.0/8"
@@ -159,7 +159,8 @@ proxy-groups:
 
 # 也可以一行写完
 #  - {name: 普通, type: 'select', proxies: []}
-#  - {name: 自动, type: 'fallback', url: 'http://www.gstatic.com/generate_204', interval: 90, lazy:true, use: []}
+#  - {name: 自动, type: 'fallback', use: [], filter: '', interval: 90, url: 'http://www.gstatic.com/generate_204'}
+# 更多策略组属性查看 https://wiki.metacubex.one/config/proxy-groups/
 
   - name: 手动切换
     type: select
@@ -288,5 +289,6 @@ rules:
   - RULE-SET,IP-Fastly,手动切换
   - RULE-SET,IP-Google,手动切换
   - RULE-SET,IP-LAN,直连
-  - RULE-SET,IP-China,直连
+  - RULE-SET,IP-China,直连     #可修改   #要么用这个规则集，要么打开GEOIP
+  #- GEOIP,CN,DIRECT     #可修改   #如果能定期更新GEOIP库，就可以取代IP-China规则集，并打开dns配置中的GEOIP选项
   - MATCH,漏网之鱼
