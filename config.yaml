@@ -1,104 +1,134 @@
 mixed-port: 7890    #可修改 #使用相同端口运行http代理服务和socks代理服务
-  #port: 7890    #可修改 #http代理端口
-  #socks-port: 7890    #可修改 #socks4/5代理端口
-  #interface-name: en0
+#port: 7890         #可修改 #http代理端口
+#socks-port: 7890   #可修改 #socks4/5代理端口
 bind-address: "*"
-allow-lan: false
-  #authentication:
-    #- "user1:pass1"
+#interface-name: en0
+#routing-mark: 6666
+ipv6: false
+
 mode: rule
 log-level: silent
-ipv6: false
-  #routing-mark: 6666
-external-controller: "127.0.0.1:9090"
-  #external-ui: folder  # http://{{external-controller}}/ui
+
+#tun:
+  #enable: true
+  #stack: system  # or gvisor
+  #auto-route: true
+  #auto-detect-interface: true
+  #dns-hijack:
+    #- any:53
+    #- tcp://any:53
+
+external-controller: "127.0.0.1:9090"   # http://{{external-controller}}/ui
+  #external-ui-url: "https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip" #从 GitHub Pages 分支获取
+  #external-ui: folder
   #secret: ""
-  #hosts:
-    #'*.clash.dev': 127.0.0.1
+
+allow-lan: false
+#lan-allowed-ips:
+  #- 0.0.0.0/0
+#lan-disallowed-ips:
+  #- ::/0
+#authentication:
+  #- "user1:pass1"
+#skip-auth-prefixes:
+  #- 127.0.0.1/8
+  #- ::1/128
+
 profile:
   store-selected: true
   store-fake-ip: true
-  #tun:
-   #enable: true
-   #stack: system  # or gvisor
-   #auto-route: true
-   #auto-detect-interface: true
-   #dns-hijack:
-     #- any:53
-     #- tcp://any:53
+  
+unified-delay: true
+tcp-concurrent: true
+
+geodata-mode: true 
+geodata-loader: memconservative
+geo-auto-update: true
+geo-update-interval: 24
+geox-url:
+  geoip: "https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geoip.dat"
+  geosite: "https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geosite.dat"
+  #mmdb: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/country.mmdb"
+  #asn: "https://github.com/xishang0128/geoip/releases/download/latest/GeoLite2-ASN.mmdb"
+
+#hosts:
+  #"*.clash.dev": 127.0.0.1
 
 dns:
   enable: true
-  listen: "0.0.0.0:53"
   ipv6: false
+  prefer-h3: false
+  use-hosts: true
+  use-system-hosts: true
+  respect-rules: false   #dns 连接跟随 rules，需配置 proxy-server-nameserver。
+  listen: "0.0.0.0:1053"
   enhanced-mode: fake-ip
   fake-ip-range: "198.18.0.1/16"
-  #use-hosts: true
-  fake-ip-filter:    #可修改  #直接返回真实ip的域名
-    - "time.windows.com"
-    - "time.apple.com"
-    - "time.android.com"
+  fake-ip-filter:   #可修改  #直接返回真实ip的域名
     - "ntp.aliyun.com"
-    - "time.pool.aliyun.com"
-    - "ntp.ntsc.ac.cn"
-    - "cn.ntp.org.cn"
-    - "edu.ntp.org.cn"
-    - "cn.pool.ntp.org"
-    - "pool.ntp.org"
-    - "asia.pool.ntp.org"
-    - "pool.ntp.org"
-  #nameserver-policy:    #可修改  #为特定域名指定dns服务器，按需启用
-    #"+.qq.com": "119.29.29.29"
+    - "time.windows.com"
+    - "localhost.ptlogin2.qq.com"
+    - "+.tailscale.com"
+    - "*.lan"
+    - "*.mtalk.google.com"
+  #nameserver-policy:   #可修改  #为特定域名指定dns服务器，按需启用
+    #"+.qq.com": "114.114.114.114"
   default-nameserver:
-    - "114.114.114.114"
+    - "119.29.29.29"
+    - "223.5.5.5"
   nameserver:
-    #- "tls://dns.alidns.com:853"
-    - "https://dns.alidns.com/dns-query"
-    #- "tls://dot.pub:853"
     - "https://doh.pub/dns-query"
+    - "https://dns.alidns.com/dns-query"
   fallback:
-    - "https://1.1.1.1/dns-query"
-    - "https://185.222.222.222/dns-query"
-    - "https://45.11.45.11/dns-query"
+    - "https://dns.adguard.com/dns-query"
+    - "https://cloudflare-dns.com/dns-query"
+    - "https://dns.google/dns-query"
+    - "https://doh.sb/dns-query"
+  #proxy-server-nameserver:   #代理节点域名解析服务器，仅用于解析代理节点的域名
+    #- "https://doh.pub/dns-query"
+    #- "https://dns.alidns.com/dns-query"
   fallback-filter:
-    #geoip: true    #本配置不使用geoip，如使用meta内核或者自定义geoip库可修改，按需启用
-    #geoip-code: CN
+    geoip: true      #除了 geoip-code 配置的国家IP,其他的IP结果会被视为污染
+    geoip-code: CN   #geoip-code 配置的国家的结果会直接采用,否则将采用fallback结果
+    geosite:   #geosite列表的内容被视为已污染,匹配到geosite的域名,将只使用fallback解析,不去使用nameserver
+      - gfw
+      #- geolocation-!cn   #使用no_resolve可以省略此项目，加快速度
     ipcidr:
-      - "0.0.0.0/8"
-      - "10.0.0.0/8"
-      - "28.0.0.0/8"
-      - "100.64.0.0/10"
+      #- "0.0.0.0/8"
+      #- "10.0.0.0/8"
+      #- "28.0.0.0/8"
+      #- "100.64.0.0/10"
       - "127.0.0.0/8"
-      - "169.254.0.0/16"
-      - "172.16.0.0/12"
-      - "192.0.0.0/24"
-      - "192.0.2.0/24"
-      - "192.88.99.0/24"
-      - "192.168.0.0/16"
-      - "198.18.0.0/15"
-      - "198.51.100.0/24"
-      - "203.0.113.0/24"
-      - "224.0.0.0/3"
-      - "255.255.255.255/32"
-      - "::1/128"
-      - "fc00::/7"
-      - "fe80::/10"
-    domain:    #可修改  #默认使用fallback dns查询的域名
-      - "+.jsdelivr.net"
-      - "+.github.com"
-      - "+.githubusercontent.com"
+      #- "169.254.0.0/16"
+      #- "172.16.0.0/12"
+      #- "192.0.0.0/24"
+      #- "192.0.2.0/24"
+      #- "192.88.99.0/24"
+      #- "192.168.0.0/16"
+      #- "198.18.0.0/15"
+      #- "198.51.100.0/24"
+      #- "203.0.113.0/24"
+      #- "224.0.0.0/3"
+      - 240.0.0.0/4
+      #- "255.255.255.255/32"
+      #- "::1/128"
+      #- "fc00::/7"
+      #- "fe80::/10"
+    domain:   #可修改  #默认使用fallback dns查询的域名
       - "sub.id9.cc"
       - "sub.xeton.dev"
       - "api.dler.io"
       - "sub.maoxiongnet.com"
-
+      - "+.jsdelivr.net"
+      - "+.github.com"
+      - "+.githubusercontent.com"
+      - "*.google.com"
 
 #proxies:    #可修改  #独立节点，本配置默认不使用，按需启用
 
-
 proxy-providers:
-
 # 字典嵌套字典类型
+# 缩进检查严格，注意对齐
 #  name:          #可修改  #节点集合名称，不可重复。改名后记得同步修改 proxy-groups 中的名称
 #    type:          #类型：http、file
 #    path:          #可修改  #本地文件名，多个集合可使用相同文件名，通过filter过滤节点
@@ -142,11 +172,9 @@ proxy-providers:
       url: 'http://www.gstatic.com/generate_204'
       interval: 900
 
-
 proxy-groups:
-
-# 注意对齐缩进
 # 列表嵌套字典类型
+# 缩进检查严格，注意对齐
 # - name:             #可修改  #节点分组名称，不可重复
 #   type:               #可修改  #分组模式：select、fallback、url-test、load-balance
 #   url:                  #测速地址，不建议修改
@@ -206,12 +234,8 @@ proxy-groups:
     proxies:
       - DIRECT
       - 手动切换
-      
-  - name: 直连
-    type: select
-    proxies:
-      - DIRECT
-      - 手动切换
+ 
+  - {name: 直连, type: select, proxies: [DIRECT, '手动切换']}
 
   - name: 拦截
     type: select
@@ -226,69 +250,38 @@ proxy-groups:
       - 手动切换
       - DIRECT
 
-
-rule-providers:
-
-# 字典嵌套字典类型
-# name:                       # 可修改  #规则集合名称，不可重复
-#    type:                     #类型：http、file
-#    behavior:               #格式：domain、ipcidr、classical
-#    url:                        #订阅网址，只要包含 payload 字段就行，使用英文引号避免包含yaml保留字符
-#    path:                     #可修改  #本地文件名
-#    interval: 259200    #可修改  #更新间隔，不需要太频繁
-
-  IP-China: {type: http, behavior: ipcidr, url: 'https://raw.githubusercontent.com/QieSen/ConfigTemplateForClash/main/rules/cncidr.yaml', path: './providers/rules/ipcidr-China.yaml', interval: 259200}
-  IP-Fastly: {type: http, behavior: ipcidr, url: 'https://raw.githubusercontent.com/QieSen/ConfigTemplateForClash/main/rules/fastlycidr.yaml', path: './providers/rules/ipcidr-fastly.yaml', interval: 259200}
-  IP-Google: {type: http, behavior: ipcidr, url: 'https://raw.githubusercontent.com/QieSen/ConfigTemplateForClash/main/rules/googlecidr.yaml', path: './providers/rules/ipcidr-google.yaml', interval: 259200}
-  IP-Cloudflare: {type: http, behavior: ipcidr, url: 'https://raw.githubusercontent.com/QieSen/ConfigTemplateForClash/main/rules/cloudflarecidr.yaml', path: './providers/rules/ipcidr-cloudflare.yaml', interval: 259200}
-  IP-Cloudfront: {type: http, behavior: ipcidr, url: 'https://raw.githubusercontent.com/QieSen/ConfigTemplateForClash/main/rules/cloudfrontcidr.yaml', path: './providers/rules/ipcidr-cloudfront.yaml', interval: 259200}
-  混合-GoogleFCM: {type: http, behavior: classical, url: 'https://raw.githubusercontent.com/QieSen/ConfigTemplateForClash/main/rules/GoogleFCM.yaml', path: './providers/rules/classical-googleFCM.yaml', interval: 259200}
-  混合-GooglePlay: {type: http, behavior: classical, url: 'https://raw.githubusercontent.com/QieSen/ConfigTemplateForClash/main/rules/GooglePlay.yaml', path: './providers/rules/classical-googlePlay.yaml', interval: 259200} 
-  IP-LAN: {type: http, behavior: ipcidr, url: 'https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/lancidr.txt', path: './providers/rules/ipcidr-lan.yaml', interval: 259200}
-  IP-Telegram: {type: http, behavior: ipcidr, url: 'https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/telegramcidr.txt', path: './providers/rules/ipcidr-telegram.yaml', interval: 259200}
-  域名-reject: {type: http, behavior: domain, url: 'https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/reject.txt', path: './providers/rules/domain-reject.yaml', interval: 259200}
-  域名-direct: {type: http, behavior: domain, url: 'https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/direct.txt', path: './providers/rules/domain-direct.yaml', interval: 259200}
-  域名-gfw: {type: http, behavior: domain, url: 'https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/gfw.txt', path: './providers/rules/domain-gfw.yaml', interval: 259200}
-  域名-proxy: {type: http, behavior: domain, url: 'https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/proxy.txt', path: './providers/rules/domain-proxy.yaml', interval: 259200}
-  域名-greatfire: {type: http, behavior: domain, url: 'https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/greatfire.txt', path: './providers/rules/domain-greatfire.yaml', interval: 259200}
-  混合-常用程序: {type: http, behavior: classical, url: 'https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/applications.txt', path: './providers/rules/classical-applications.yaml', interval: 259200}
-  混合-BanAD: {type: http, behavior: classical, url: 'https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Providers/BanAD.yaml', path: './providers/rules/classical-BanAD.yaml', interval: 259200}
-  混合-China: {type: http, behavior: classical, url: 'https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Providers/ChinaDomain.yaml', path: './providers/rules/classical-China.yaml', interval: 259200}
-  混合-Steam: {type: http, behavior: classical, url: 'https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Providers/Ruleset/Steam.yaml', path: './providers/rules/classical-Steam.yaml', interval: 259200}
-  混合-SteamCN: {type: http, behavior: classical, url: 'https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Providers/Ruleset/SteamCN.yaml', path: './providers/rules/classical-SteamCN.yaml', interval: 259200}
-  混合-Netflix: {type: http, behavior: classical, url: 'https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Providers/Ruleset/Netflix.yaml', path: './providers/rules/classical-Netflix.yaml', interval: 259200}
-  混合-Youtube: {type: http, behavior: classical, url: 'https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Providers/Ruleset/YouTube.yaml', path: './providers/rules/classical-Youtube.yaml', interval: 259200}
-  混合-Spotify: {type: http, behavior: classical, url: 'https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Providers/Ruleset/Spotify.yaml', path: './providers/rules/classical-Spotify.yaml', interval: 259200}
-
+rule-providers:  
+  microsoft_cdn_non_ip: {type: http, behavior: classical, format: text, interval: 43200, url: "https://ruleset.skk.moe/Clash/non_ip/microsoft_cdn.txt", path: "./sukkaw_ruleset/microsoft_cdn_non_ip.txt"}
+  cdn_domainset: {type: http, behavior: domain, format: text, interval: 43200, url: "https://ruleset.skk.moe/Clash/domainset/cdn.txt", path: "./sukkaw_ruleset/cdn_domainset.txt"}
+  cdn_non_ip: {type: http, behavior: classical, format: text, interval: 43200, url: "https://ruleset.skk.moe/Clash/non_ip/cdn.txt", path: "./sukkaw_ruleset/cdn_non_ip.txt"}
+  lan_non_ip: {type: http, behavior: classical, format: text, interval: 43200, url: "https://ruleset.skk.moe/Clash/non_ip/lan.txt", path: "./sukkaw_ruleset/lan_non_ip.txt"}
+  lan_ip: {type: http, behavior: classical, format: text, interval: 43200, url: "https://ruleset.skk.moe/Clash/ip/lan.txt", path: "./sukkaw_ruleset/lan_ip.txt"}
+  reject_ip: {type: http, behavior: classical, format: text, interval: 43200, url: "https://ruleset.skk.moe/Clash/ip/reject.txt", path: "./sukkaw_ruleset/reject_ip.txt"}
+  MX-GoogleFCM: {type: http, behavior: classical, interval: 43200, url: "https://raw.githubusercontent.com/QieSen/ConfigTemplateForClash/main/rules/GoogleFCM.yaml", path: "./rules/classical-googleFCM.yaml"}
+  MX-OneDrive: {type: http, behavior: classical, interval: 43200, url: "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Providers/Ruleset/OneDrive.yaml", path: "./rules/classical-OneDrive.yaml"}
+  MX-GooglePlay: {type: http, behavior: classical, interval: 43200, url: "https://raw.githubusercontent.com/QieSen/ConfigTemplateForClash/main/rules/GooglePlay.yaml", path: "./rules/classical-googlePlay.yaml"}
 
 rules:
-
-# 有序列表类型，自上而下匹配
-# 一般来说：特定需求 > 广告屏蔽 > 代理规则 > 直连规则 > IP规则（需要本地DNS解析） > MATCH
-
-  - DOMAIN-SUFFIX,gstatic.com,手动切换    #特定需求可添加单条规则
-  - RULE-SET,IP-Telegram,手动切换,no-resolve
-  - RULE-SET,混合-BanAD,拦截
-  - RULE-SET,域名-reject,拦截
-  - RULE-SET,混合-GoogleFCM,谷歌推送     # 只要DNS靠谱，绝大部分时间中FCM均可直连正常工作，稳定性优于使用节点
-  - RULE-SET,混合-GooglePlay,手动切换
+  - DOMAIN-SUFFIX,geo2.adobe.com,REJECT-DROP
+  - GEOSITE,category-ads-all,REJECT
+  - GEOSITE,APPLE-CN,直连
+  - GEOSITE,category-games@cn,直连
+  - RULE-SET,microsoft_cdn_non_ip,直连
+  - AND,((DST-PORT,5228),(RULE-SET,MX-GoogleFCM)),手动切换
+  - GEOSITE,YOUTUBE,手动切换
+  - GEOSITE,TELEGRAM,手动切换
+  - RULE-SET,MX-OneDrive,手动切换
+  - RULE-SET,MX-GooglePlay,手动切换
+  - RULE-SET,lan_non_ip,DIRECT
+  - GEOSITE,CN,DIRECT
   - DOMAIN-KEYWORD,google,手动切换
-  - RULE-SET,混合-SteamCN,直连
-  - RULE-SET,混合-Steam,手动切换
-  - RULE-SET,混合-Netflix,手动切换
-  - RULE-SET,混合-Youtube,手动切换
-  - RULE-SET,混合-Spotify,手动切换
-  - RULE-SET,混合-常用程序,直连
-  - RULE-SET,混合-China,直连
-  - RULE-SET,域名-direct,直连
-  - RULE-SET,域名-gfw,手动切换
-  - RULE-SET,域名-proxy,手动切换
-  - RULE-SET,域名-greatfire,手动切换
-  - RULE-SET,IP-Cloudflare,手动切换
-  - RULE-SET,IP-Cloudfront,手动切换
-  - RULE-SET,IP-Fastly,手动切换
-  - RULE-SET,IP-Google,手动切换
-  - RULE-SET,IP-LAN,直连
-  - RULE-SET,IP-China,直连     #可修改   #要么用这个规则集，要么打开GEOIP
-  #- GEOIP,CN,DIRECT     #可修改   #如果能定期更新GEOIP库，就可以取代IP-China规则集，并打开dns配置中的GEOIP选项
-  - MATCH,漏网之鱼
+# ===基于IP的规则===
+  - RULE-SET,reject_ip,REJECT,no-resolve
+  - GEOIP,GOOGLE,手动切换,no-resolve
+  - GEOIP,TELEGRAM,手动切换,no-resolve
+  - GEOIP,FASTLY,手动切换,no-resolve
+  - GEOIP,CLOUDFLARE,手动切换,no-resolve
+  - GEOIP,CLOUDFRONT,手动切换,no-resolve
+  - GEOIP,PRIVATE,DIRECT,no-resolve
+  - GEOIP,CN,DIRECT,no-resolve
+  - MATCH,手动切换
