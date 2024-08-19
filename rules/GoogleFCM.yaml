@@ -1,5 +1,4 @@
 payload: 
-- DST-PORT,5228
 - DOMAIN,mtalk.google.com
 - DOMAIN,alt1-mtalk.google.com
 - DOMAIN,alt2-mtalk.google.com
