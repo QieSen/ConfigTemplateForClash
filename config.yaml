@@ -268,7 +268,7 @@ rules:
   - AND,((DST-PORT,5228),(RULE-SET,MX-GoogleFCM)),手动切换
   - GEOSITE,YOUTUBE,手动切换
   - GEOSITE,TELEGRAM,手动切换
-  - RULE-SET,MX-Spotify,手动切换
+  - RULE-SET,MX-Spotify,手动切换,no-resolve
   - RULE-SET,MX-OneDrive,手动切换
   - RULE-SET,MX-GooglePlay,手动切换
   - RULE-SET,lan_non_ip,DIRECT
