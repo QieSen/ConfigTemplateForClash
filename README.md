@@ -1,4 +1,4 @@
-A configuration template for clash.
+A [configuration template](https://github.com/QieSen/ConfigTemplateForClash/blob/main/config.yaml) for clash.
 
 [简体中文 in Simplified Chinese](https://github.com/QieSen/ConfigTemplateForClash/blob/main/README_CHS.md)
 

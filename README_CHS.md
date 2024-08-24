@@ -1,4 +1,4 @@
-clash 配置文件模板
+clash [配置文件模板](https://github.com/QieSen/ConfigTemplateForClash/blob/main/config.yaml)
 
 ## 特点
 
