@@ -252,15 +252,13 @@ proxy-groups:
 
 rule-providers:  
   microsoft_cdn_non_ip: {type: http, behavior: classical, format: text, interval: 43200, url: "https://ruleset.skk.moe/Clash/non_ip/microsoft_cdn.txt", path: "./sukkaw_ruleset/microsoft_cdn_non_ip.txt"}
-  cdn_domainset: {type: http, behavior: domain, format: text, interval: 43200, url: "https://ruleset.skk.moe/Clash/domainset/cdn.txt", path: "./sukkaw_ruleset/cdn_domainset.txt"}
-  cdn_non_ip: {type: http, behavior: classical, format: text, interval: 43200, url: "https://ruleset.skk.moe/Clash/non_ip/cdn.txt", path: "./sukkaw_ruleset/cdn_non_ip.txt"}
   lan_non_ip: {type: http, behavior: classical, format: text, interval: 43200, url: "https://ruleset.skk.moe/Clash/non_ip/lan.txt", path: "./sukkaw_ruleset/lan_non_ip.txt"}
-  lan_ip: {type: http, behavior: classical, format: text, interval: 43200, url: "https://ruleset.skk.moe/Clash/ip/lan.txt", path: "./sukkaw_ruleset/lan_ip.txt"}
   reject_ip: {type: http, behavior: classical, format: text, interval: 43200, url: "https://ruleset.skk.moe/Clash/ip/reject.txt", path: "./sukkaw_ruleset/reject_ip.txt"}
   MX-GoogleFCM: {type: http, behavior: classical, interval: 43200, url: "https://raw.githubusercontent.com/QieSen/ConfigTemplateForClash/main/rules/GoogleFCM.yaml", path: "./rules/classical-googleFCM.yaml"}
   MX-OneDrive: {type: http, behavior: classical, interval: 43200, url: "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Providers/Ruleset/OneDrive.yaml", path: "./rules/classical-OneDrive.yaml"}
   MX-GooglePlay: {type: http, behavior: classical, interval: 43200, url: "https://raw.githubusercontent.com/QieSen/ConfigTemplateForClash/main/rules/GooglePlay.yaml", path: "./rules/classical-googlePlay.yaml"}
-
+  MX-Spotify: {type: http, behavior: classical, interval: 43200, url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Spotify/Spotify.yaml", path: "./rules/classical-Spotify.yaml"}
+ 
 rules:
   - DOMAIN-SUFFIX,geo2.adobe.com,REJECT-DROP
   - GEOSITE,category-ads-all,REJECT
@@ -270,6 +268,7 @@ rules:
   - AND,((DST-PORT,5228),(RULE-SET,MX-GoogleFCM)),手动切换
   - GEOSITE,YOUTUBE,手动切换
   - GEOSITE,TELEGRAM,手动切换
+  - RULE-SET,MX-Spotify,手动切换
   - RULE-SET,MX-OneDrive,手动切换
   - RULE-SET,MX-GooglePlay,手动切换
   - RULE-SET,lan_non_ip,DIRECT
